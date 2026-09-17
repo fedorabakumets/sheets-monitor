@@ -655,8 +655,7 @@
         }
 
         .cards-view[data-card-cols="3"] .site-screenshot,
-        .cards-view[data-card-cols="4"] .site-screenshot,
-        .cards-view[data-card-cols="5"] .site-screenshot {
+        .cards-view[data-card-cols="4"] .site-screenshot {
             aspect-ratio: 16 / 10;
         }
 
@@ -1362,7 +1361,7 @@
 
         .cards-view table tbody td:first-child a:not(.site-screenshot-link):not(.tg-discuss-link) {
             font-weight: 600;
-            font-size: 0.9em;
+            font-size: 1.05em;
             color: #0066cc;
             grid-column: 1;
             border-bottom: none;
@@ -1397,12 +1396,10 @@
 
 
         @media (max-width: 900px) {
-            .cards-view[data-card-cols="4"] table tbody,
-            .cards-view[data-card-cols="5"] table tbody {
+            .cards-view[data-card-cols="4"] table tbody {
                 gap: 8px;
             }
-            .cards-view[data-card-cols="4"] table tbody tr,
-            .cards-view[data-card-cols="5"] table tbody tr {
+            .cards-view[data-card-cols="4"] table tbody tr {
                 padding: 8px;
                 gap: 8px;
             }
@@ -1424,8 +1421,7 @@
             .cards-view table tbody tr {
                 padding: 12px;
             }
-            .cards-view[data-card-cols="4"] table tbody tr,
-            .cards-view[data-card-cols="5"] table tbody tr {
+            .cards-view[data-card-cols="4"] table tbody tr {
                 padding: 8px;
                 gap: 8px;
             }
@@ -1497,7 +1493,6 @@
                 <button type="button" class="card-columns-btn" data-cols="2" aria-label="2 карточки в ряд">2</button>
                 <button type="button" class="card-columns-btn" data-cols="3" aria-label="3 карточки в ряд">3</button>
                 <button type="button" class="card-columns-btn" data-cols="4" aria-label="4 карточки в ряд">4</button>
-                <button type="button" class="card-columns-btn" data-cols="5" aria-label="5 карточек в ряд">5</button>
             </div>
             <select id="themeSwitch" aria-label="Выбор темы">
                 <option value="light">Светлая</option>
@@ -1604,7 +1599,7 @@
             theme: 'light',
             view: 'table',
             cardColumns: 2,
-            cardColumnsMax: 5,
+            cardColumnsMax: 4,
             user: null,
             page: 1,
             rowsPerPage: 10,
@@ -1673,7 +1668,7 @@
 
         function setCardColumns(count) {
             const cols = Number(count);
-            const max = appState.cardColumnsMax || 5;
+            const max = appState.cardColumnsMax || 4;
             appState.cardColumns = (cols >= 1 && cols <= max) ? cols : 2;
             localStorage.setItem('cardColumns', String(appState.cardColumns));
             updateCardColumnsUI();
@@ -1693,9 +1688,10 @@
         function restoreViewPreferences() {
             const savedView = localStorage.getItem('view') === 'cards' ? 'cards' : 'table';
             const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
-            const max = appState.cardColumnsMax || 5;
+            const max = appState.cardColumnsMax || 4;
             appState.view = savedView;
-            appState.cardColumns = (savedCols >= 1 && savedCols <= max) ? savedCols : 2;
+            appState.cardColumns = (savedCols >= 1) ? Math.min(savedCols, max) : 2;
+            if (savedCols > max) localStorage.setItem('cardColumns', String(appState.cardColumns));
             const tableSection = document.querySelector('.table-section');
             if (tableSection) {
                 tableSection.classList.toggle('cards-view', appState.view === 'cards');
