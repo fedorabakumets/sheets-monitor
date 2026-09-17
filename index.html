@@ -493,6 +493,34 @@
         .payment-wise { background: #347EFF; }
         .payment-stripe { background: #635BFF; }
 
+        .tg-topic-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #229ED9;
+            font-weight: 600;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .tg-topic-link:hover {
+            color: #1a7fb0;
+            text-decoration: underline;
+        }
+
+        .tg-topic-link i {
+            font-size: 1.15em;
+        }
+
+        .cards-view table tbody td a.tg-topic-link {
+            color: #229ED9;
+            font-weight: 600;
+        }
+
+        [data-theme="dark"] .cards-view table tbody td a.tg-topic-link {
+            color: #5ec8f0;
+        }
+
         td a {
             color: #0066cc;
             text-decoration: none;
@@ -801,7 +829,7 @@
                 margin-top: 1px;
             }
             table {
-                min-width: 1000px;
+                min-width: 1180px;
             }
         }
 
@@ -1005,7 +1033,8 @@
             line-height: 1.4;
         }
 
-        a.payment-link::after {
+        a.payment-link::after,
+        a.tg-topic-link::after {
             content: '';
             display: none !important;
         }
@@ -1103,11 +1132,12 @@
 
         <div id="cardSortHeaders" class="card-sort-headers" style="display: none;">
             <button onclick="sortTable(0)" class="sort-header-btn">Название сайта <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
-            <button onclick="sortTable(1)" class="sort-header-btn">Дата создания <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
-            <button onclick="sortTable(2)" class="sort-header-btn">Минимальная сумма вывода <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
-            <button onclick="sortTable(3)" class="sort-header-btn">Сложность для регистрации и вывода средств <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
-            <button onclick="sortTable(4)" class="sort-header-btn">Платежные системы <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
-            <button onclick="sortTable(5)" class="sort-header-btn">Тип работы <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(1)" class="sort-header-btn">Топик Telegram <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(2)" class="sort-header-btn">Дата создания <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(3)" class="sort-header-btn">Минимальная сумма вывода <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(4)" class="sort-header-btn">Сложность для регистрации и вывода средств <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(5)" class="sort-header-btn">Платежные системы <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
+            <button onclick="sortTable(6)" class="sort-header-btn">Тип работы <span class="sort-icon"><i class="fas fa-sort"></i></span></button>
         </div>
 
         <section class="table-section">
@@ -1115,11 +1145,12 @@
                 <thead>
                     <tr>
                         <th onclick="sortTable(0)">Название сайта <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable(1)">Дата создания <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable(2)">Минимальная сумма вывода <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable(3)">Сложность для регистрации и вывода средств <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable(4)">Платежные системы <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
-                        <th onclick="sortTable(5)">Тип работы <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(1)">Топик Telegram <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(2)">Дата создания <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(3)">Минимальная сумма вывода <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(4)">Сложность для регистрации и вывода средств <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(5)">Платежные системы <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
+                        <th onclick="sortTable(6)">Тип работы <span class="sort-icon"><i class="fas fa-sort"></i></span></th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -1133,10 +1164,15 @@
         // JavaScript Functionality
         const DEFAULT_PROTOCOL = 'https://';
         const COLUMN_KEYS = [
-            'Название сайта', 'Дата создания', 'Минимальная сумма вывода',
+            'Название сайта', 'Топик Telegram', 'Дата создания', 'Минимальная сумма вывода',
             'Сложность для регистрации и вывода средств', 'Платежные системы',
             'Тип работы'
         ];
+        const YEAR_COL = 2;
+        const PAYOUT_COL = 3;
+        const DIFFICULTY_COL = 4;
+        const PAYMENTS_COL = 5;
+        const WORK_COL = 6;
         const DIFFICULTY_ORDER = { Легкая: 1, Средняя: 2, Сложная: 3 };
         const TABLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1897875028';
         const FILTERS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1897875028';
@@ -1297,6 +1333,38 @@
             return document.createTextNode(escapeHTML(text));
         }
 
+        function createTelegramLink(text) {
+            const url = (text || '').trim();
+            if (!url) return document.createTextNode('Нет топика');
+
+            let href = url;
+            try {
+                href = url.match(/^[a-zA-Z]+:\/\//) ? url : `${DEFAULT_PROTOCOL}${url}`;
+                const parsed = new URL(href);
+                const host = parsed.hostname.replace(/^www\./, '').toLowerCase();
+                if (host !== 't.me' && host !== 'telegram.me') {
+                    return document.createTextNode(escapeHTML(url));
+                }
+                href = parsed.href;
+            } catch {
+                return document.createTextNode(escapeHTML(url));
+            }
+
+            const link = document.createElement('a');
+            link.href = href;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer nofollow';
+            link.className = 'tg-topic-link';
+            link.setAttribute('aria-label', 'Открыть топик в Telegram');
+
+            const icon = document.createElement('i');
+            icon.className = 'fab fa-telegram-plane';
+            icon.setAttribute('aria-hidden', 'true');
+            link.appendChild(icon);
+            link.appendChild(document.createTextNode(' Топик'));
+            return link;
+        }
+
         function shortenSiteName(site) {
             const match = site?.match(/^(?:.*\.)?([^.]+\.[a-zA-Z]{2,})(?:\/|$)/);
             const name = match ? match[1] : site || '';
@@ -1338,11 +1406,12 @@
             appState.latestUpdateFromH = datesInH.length > 0 ? new Date(Math.max(...datesInH)) : null;
             return rows.slice(1).map(row => ({
                 [COLUMN_KEYS[0]]: row[0] || '',
-                [COLUMN_KEYS[1]]: normalizeText(row[1] || ''),
+                [COLUMN_KEYS[1]]: (row[1] || '').trim(),
                 [COLUMN_KEYS[2]]: normalizeText(row[2] || ''),
                 [COLUMN_KEYS[3]]: normalizeText(row[3] || ''),
-                [COLUMN_KEYS[4]]: row[4] ? row[4].split(/,\s*/).map(normalizeText).join(', ') : '',
-                [COLUMN_KEYS[5]]: row[5] ? row[5].split(/,\s*/).map(normalizeText).join(', ') : ''
+                [COLUMN_KEYS[4]]: normalizeText(row[4] || ''),
+                [COLUMN_KEYS[5]]: row[5] ? row[5].split(/,\s*/).map(normalizeText).join(', ') : '',
+                [COLUMN_KEYS[6]]: row[6] ? row[6].split(/,\s*/).map(normalizeText).join(', ') : ''
             })).filter(row => row[COLUMN_KEYS[0]]);
         }
 
@@ -1354,8 +1423,8 @@
             const payments = new Set();
             const work = new Set();
             rows.slice(1).forEach(row => {
-                (row[4] || '').split(/,\s*/).forEach(p => { if (p) payments.add(normalizeText(p)); });
-                (row[5] || '').split(/,\s*/).forEach(w => { if (w) work.add(normalizeText(w)); });
+                (row[5] || '').split(/,\s*/).forEach(p => { if (p) payments.add(normalizeText(p)); });
+                (row[6] || '').split(/,\s*/).forEach(w => { if (w) work.add(normalizeText(w)); });
             });
             return {
                 payments: [...payments].sort(),
@@ -1386,7 +1455,8 @@
                     columnData.forEach(row => {
                         const tr = document.createElement('tr');
                         for (let i = 0; i < COLUMN_KEYS.length; i++) {
-                            tr.appendChild(createTableCell(row[COLUMN_KEYS[i]], COLUMN_KEYS[i], i === 0 ? createLinkElement : undefined));
+                            const creator = i === 0 ? createLinkElement : (i === 1 ? createTelegramLink : undefined);
+                            tr.appendChild(createTableCell(row[COLUMN_KEYS[i]], COLUMN_KEYS[i], creator));
                         }
                         colDiv.appendChild(tr);
                     });
@@ -1396,7 +1466,8 @@
                 paginatedData.forEach(row => {
                     const tr = document.createElement('tr');
                     for (let i = 0; i < COLUMN_KEYS.length; i++) {
-                        tr.appendChild(createTableCell(row[COLUMN_KEYS[i]], COLUMN_KEYS[i], i === 0 ? createLinkElement : undefined));
+                        const creator = i === 0 ? createLinkElement : (i === 1 ? createTelegramLink : undefined);
+                        tr.appendChild(createTableCell(row[COLUMN_KEYS[i]], COLUMN_KEYS[i], creator));
                     }
                     tbody.appendChild(tr);
                 });
@@ -1500,11 +1571,13 @@
             
             if (label === 'Платежные системы') {
                 td.appendChild(createPaymentIconsElement(value));
+            } else if (label === 'Топик Telegram' && creator) {
+                td.appendChild(creator(value));
             } else {
                 td.appendChild(creator(value));
             }
             
-            if (value && /\d+(\.\d+)?/.test(value)) td.classList.add('numeric');
+            if (label !== 'Топик Telegram' && value && /\d+(\.\d+)?/.test(value)) td.classList.add('numeric');
             return td;
         }
 
@@ -1572,19 +1645,19 @@
                 let aValue = a[COLUMN_KEYS[columnIndex]] || '';
                 let bValue = b[COLUMN_KEYS[columnIndex]] || '';
                 
-                if (columnIndex === 2) {
+                if (columnIndex === PAYOUT_COL) {
                     const aNum = parseFloat(aValue.replace(/[^\d.-]/g, '')) || 0;
                     const bNum = parseFloat(bValue.replace(/[^\d.-]/g, '')) || 0;
                     return appState.sort.direction * (aNum - bNum);
                 }
                 
-                if (columnIndex === 1) {
+                if (columnIndex === YEAR_COL) {
                     const aTime = Date.parse(aValue) || 0;
                     const bTime = Date.parse(bValue) || 0;
                     return appState.sort.direction * (aTime - bTime);
                 }
                 
-                if (columnIndex === 3) {
+                if (columnIndex === DIFFICULTY_COL) {
                     return appState.sort.direction * ((DIFFICULTY_ORDER[aValue] || 0) - (DIFFICULTY_ORDER[bValue] || 0));
                 }
                 
@@ -1662,13 +1735,13 @@
             let filteredData = [...appState.originalTableData];
             if (selectedPayments.length > 0) {
                 filteredData = filteredData.filter(row => {
-                    const payments = (row[COLUMN_KEYS[4]] || '').split(/,\s*/).map(item => item.trim()).filter(Boolean);
+                    const payments = (row[COLUMN_KEYS[PAYMENTS_COL]] || '').split(/,\s*/).map(item => item.trim()).filter(Boolean);
                     return selectedPayments.some(p => payments.includes(p));
                 });
             }
             if (selectedWork.length > 0) {
                 filteredData = filteredData.filter(row => {
-                    const work = (row[COLUMN_KEYS[5]] || '').split(/,\s*/).map(item => item.trim()).filter(Boolean);
+                    const work = (row[COLUMN_KEYS[WORK_COL]] || '').split(/,\s*/).map(item => item.trim()).filter(Boolean);
                     return selectedWork.some(w => work.includes(w));
                 });
             }
@@ -1739,6 +1812,8 @@
                 return { text: `год создания сайта`, gender: 'male' };
             } else if (paramLower.includes('платёж') || paramLower.includes('платеж')) {
                 return { text: `список поддерживаемых платёжных систем`, gender: 'male' };
+            } else if (paramLower.includes('топик') || paramLower.includes('telegram')) {
+                return { text: `топик Telegram`, gender: 'male' };
             } else if (param) {
                 return { text: param.toLowerCase(), gender: 'neuter' };
             } else {
@@ -2017,19 +2092,19 @@
                             let aValue = a[COLUMN_KEYS[savedSort.column]] || '';
                             let bValue = b[COLUMN_KEYS[savedSort.column]] || '';
                             
-                            if (savedSort.column === 2) {
+                            if (savedSort.column === PAYOUT_COL) {
                                 const aNum = parseFloat(aValue.replace(/[^\d.-]/g, '')) || 0;
                                 const bNum = parseFloat(bValue.replace(/[^\d.-]/g, '')) || 0;
                                 return savedSort.direction * (aNum - bNum);
                             }
                             
-                            if (savedSort.column === 1) {
+                            if (savedSort.column === YEAR_COL) {
                                 const aTime = Date.parse(aValue) || 0;
                                 const bTime = Date.parse(bValue) || 0;
                                 return savedSort.direction * (aTime - bTime);
                             }
                             
-                            if (savedSort.column === 3) {
+                            if (savedSort.column === DIFFICULTY_COL) {
                                 return savedSort.direction * ((DIFFICULTY_ORDER[aValue] || 0) - (DIFFICULTY_ORDER[bValue] || 0));
                             }
                             
