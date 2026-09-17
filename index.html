@@ -1622,7 +1622,7 @@
             frame.className = 'site-screenshot';
 
             const img = document.createElement('img');
-            img.src = `https://s.wordpress.com/mshots/v1/${encodeURIComponent(pageUrl)}?w=720`;
+            img.src = `https://image.thum.io/get/width/720/crop/450/noanimate/${pageUrl}`;
             img.alt = `Скриншот ${pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
             img.loading = 'lazy';
             img.decoding = 'async';
