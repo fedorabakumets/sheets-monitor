@@ -603,6 +603,66 @@
             gap: 4px;
         }
 
+        .cards-view .site-cell {
+            width: 100%;
+            gap: 8px;
+        }
+
+        .site-screenshot-link {
+            display: none;
+        }
+
+        .cards-view .site-screenshot-link {
+            display: block;
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            text-decoration: none;
+            background: linear-gradient(180deg, #dbe7f5 0%, #c5d4e8 100%);
+            border: 1px solid #d0dbe8;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+        }
+
+        .site-screenshot {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 10;
+            overflow: hidden;
+            background:
+                linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.15) 100%);
+            background-size: 200% 100%;
+            animation: screenshotShine 1.4s linear infinite;
+        }
+
+        .site-screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            vertical-align: middle;
+        }
+
+        .site-screenshot.is-ready {
+            animation: none;
+            background: #0f172a;
+        }
+
+        .site-screenshot.is-fallback {
+            animation: none;
+            background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        }
+
+        @keyframes screenshotShine {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        [data-theme="dark"] .cards-view .site-screenshot-link {
+            border-color: #3a3a3a;
+            background: #2a2a2a;
+        }
+
         .tg-discuss-link {
             display: inline-flex;
             align-items: center;
@@ -1160,18 +1220,30 @@
 
         a.payment-link::after,
         a.payment-chip::after,
-        a.tg-discuss-link::after {
+        a.tg-discuss-link::after,
+        a.site-screenshot-link::after {
             content: '';
             display: none !important;
         }
 
-        .cards-view table tbody td:first-child a {
+        .cards-view table tbody td:first-child::before {
+            display: none;
+        }
+
+        .cards-view table tbody td:first-child a:not(.site-screenshot-link):not(.tg-discuss-link) {
             font-weight: 600;
             font-size: 1.05em;
             color: #0066cc;
             grid-column: 1;
             border-bottom: none;
             padding-bottom: 0;
+        }
+
+        .cards-view table tbody td:first-child a.site-screenshot-link {
+            font-weight: 400;
+            font-size: inherit;
+            color: inherit;
+            width: 100%;
         }
 
 
@@ -1524,9 +1596,54 @@
             return link;
         }
 
-        function createSiteNameCell(siteText, telegramUrl) {
+        function getSitePageUrl(text) {
+            const match = (text || '').match(/https?:\/\/[^\s,]+/i);
+            if (!match) return '';
+            try {
+                const parsed = new URL(match[0]);
+                return `${parsed.protocol}//${parsed.host}/`;
+            } catch {
+                return '';
+            }
+        }
+
+        function createSiteScreenshot(siteText) {
+            const pageUrl = getSitePageUrl(siteText);
+            if (!pageUrl) return null;
+
+            const link = document.createElement('a');
+            link.className = 'site-screenshot-link';
+            link.href = pageUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer nofollow';
+            link.setAttribute('aria-label', 'Открыть скриншот и сайт');
+
+            const frame = document.createElement('span');
+            frame.className = 'site-screenshot';
+
+            const img = document.createElement('img');
+            img.src = `https://s.wordpress.com/mshots/v1/${encodeURIComponent(pageUrl)}?w=720`;
+            img.alt = `Скриншот ${pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
+            img.loading = 'lazy';
+            img.decoding = 'async';
+            img.referrerPolicy = 'no-referrer';
+            img.addEventListener('load', () => frame.classList.add('is-ready'));
+            img.addEventListener('error', () => {
+                frame.classList.add('is-fallback');
+                img.remove();
+            });
+            frame.appendChild(img);
+            link.appendChild(frame);
+            return link;
+        }
+
+        function createSiteNameCell(siteText, telegramUrl, withScreenshot = false) {
             const wrap = document.createElement('div');
             wrap.className = 'site-cell';
+            if (withScreenshot) {
+                const shot = createSiteScreenshot(siteText);
+                if (shot) wrap.prepend(shot);
+            }
             wrap.appendChild(createLinkElement(siteText));
             const tg = createTelegramLink(telegramUrl);
             if (tg) wrap.appendChild(tg);
@@ -1604,7 +1721,7 @@
             const tr = document.createElement('tr');
             for (let i = 0; i < COLUMN_KEYS.length; i++) {
                 const creator = i === 0
-                    ? () => createSiteNameCell(row[COLUMN_KEYS[0]], row[TOPIC_KEY])
+                    ? () => createSiteNameCell(row[COLUMN_KEYS[0]], row[TOPIC_KEY], appState.view === 'cards')
                     : undefined;
                 tr.appendChild(createTableCell(row[COLUMN_KEYS[i]], COLUMN_KEYS[i], creator));
             }
