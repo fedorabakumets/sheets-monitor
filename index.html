@@ -1644,6 +1644,22 @@
             });
         }
 
+        function restoreViewPreferences() {
+            const savedView = localStorage.getItem('view') === 'cards' ? 'cards' : 'table';
+            const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
+            const max = appState.cardColumnsMax || 5;
+            appState.view = savedView;
+            appState.cardColumns = (savedCols >= 1 && savedCols <= max) ? savedCols : 2;
+            const tableSection = document.querySelector('.table-section');
+            if (tableSection) {
+                tableSection.classList.toggle('cards-view', appState.view === 'cards');
+            }
+            const cardSortHeaders = document.getElementById('cardSortHeaders');
+            if (cardSortHeaders) cardSortHeaders.style.display = appState.view === 'cards' ? 'flex' : 'none';
+            updateViewButton();
+            updateCardColumnsUI();
+        }
+
         function updateViewButton() {
             const btn = document.getElementById('toggleViewBtn');
             if (btn) {
@@ -1794,8 +1810,9 @@
                         ? '(max-width: 768px) calc(100vw - 32px), (max-width: 1100px) 45vw, 30vw'
                         : '(max-width: 768px) calc(100vw - 32px), 45vw';
             img.alt = `Скриншот ${pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
-            img.loading = 'lazy';
+            img.loading = 'eager';
             img.decoding = 'async';
+            img.fetchPriority = 'high';
             img.referrerPolicy = 'no-referrer';
             img.addEventListener('load', () => frame.classList.add('is-ready'));
             img.addEventListener('error', () => {
@@ -2508,6 +2525,7 @@
 
         async function init() {
             try {
+                restoreViewPreferences();
                 const [tableCsv, filterCsv] = await Promise.all([
                     fetchWithRetry(TABLE_CSV_URL),
                     fetchWithRetry(FILTERS_CSV_URL)
@@ -2575,22 +2593,6 @@
                 document.querySelectorAll('.card-columns-btn').forEach(btn => {
                     btn.addEventListener('click', () => setCardColumns(btn.dataset.cols));
                 });
-
-                const savedView = localStorage.getItem('view') || 'table';
-                const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
-                const max = appState.cardColumnsMax || 5;
-                appState.cardColumns = (savedCols >= 1 && savedCols <= max) ? savedCols : 2;
-                if (savedView !== appState.view) {
-                    appState.view = savedView;
-                    const tableSection = document.querySelector('.table-section');
-                    if (tableSection) {
-                        tableSection.classList.toggle('cards-view', appState.view === 'cards');
-                    }
-                    updateViewButton();
-                }
-                const cardSortHeaders = document.getElementById('cardSortHeaders');
-                if (cardSortHeaders) cardSortHeaders.style.display = appState.view === 'cards' ? 'flex' : 'none';
-                updateCardColumnsUI();
                 document.querySelectorAll('.filter-toggle').forEach(toggle => {
                     toggle.addEventListener('click', () => {
                         const filterSection = toggle.closest('.filter-section');
