@@ -1557,6 +1557,7 @@
         const PAYMENTS_COL = 4;
         const WORK_COL = 5;
         const DIFFICULTY_ORDER = { Легкая: 1, Средняя: 2, Сложная: 3 };
+        const CRYPTO_ICON = (code) => `https://cdn.jsdelivr.net/gh/spothq/cryptocurrency-icons@master/32/color/${code}.png`;
         const PAYMENT_CATALOG = {
             'paypal': { url: 'https://www.paypal.com/', color: '#003087' },
             'webmoney': { url: 'https://webmoney.com/', color: '#036ea7' },
@@ -1566,18 +1567,21 @@
             'yoomoney': { url: 'https://yoomoney.ru/', color: '#8b3ffd' },
             'epayments': { url: 'https://www.epayments.com/', color: '#00a0e3' },
             'perfect money': { url: 'https://perfectmoney.cc/', color: '#c41e3a' },
-            'usdt': { url: 'https://tether.to/', color: '#26a17b' },
-            'trx': { url: 'https://tron.network/', color: '#eb0029' },
+            'usdt': { url: 'https://tether.to/', color: '#26a17b', icon: CRYPTO_ICON('usdt') },
+            'trx': { url: 'https://tron.network/', color: '#eb0029', icon: CRYPTO_ICON('trx') },
             'telegram stars': { url: 'https://telegram.org/', color: '#229ed9' },
             'azvox': { url: 'https://azvox.cash/', color: '#0ea5e9' },
             'fkwallet': { url: 'https://fkwallet.com/', color: '#ea580c' },
             'swapio': { url: 'https://swapio.cfd/', color: '#6366f1' },
-            'bitcoin': { url: 'https://bitcoin.org/', color: '#f7931a' },
+            'bitcoin': { url: 'https://bitcoin.org/', color: '#f7931a', icon: CRYPTO_ICON('btc') },
             'skrill': { url: 'https://www.skrill.com/', color: '#862165' },
             'paxum': { url: 'https://paxum.com/', color: '#00a651' },
             'okpay': { url: 'http://okpay.co/', color: '#334155' },
-            'litecoin': { url: 'https://litecoin.org/', color: '#345d9d' },
-            'dogecoin': { url: 'https://dogecoin.com/', color: '#c2a633' },
+            'litecoin': { url: 'https://litecoin.org/', color: '#345d9d', icon: CRYPTO_ICON('ltc') },
+            'dogecoin': { url: 'https://dogecoin.com/', color: '#c2a633', icon: CRYPTO_ICON('doge') },
+            'ton': { url: 'https://ton.org/', color: '#0098ea', icon: 'https://assets.coingecko.com/coins/images/17980/small/ton_symbol.png' },
+            'bnb': { url: 'https://www.bnbchain.org/', color: '#f3ba2f', icon: CRYPTO_ICON('bnb') },
+            'sol': { url: 'https://solana.com/', color: '#9945ff', icon: CRYPTO_ICON('sol') },
             'сбп': { url: 'https://sbp.nspk.ru/', color: '#1f7f54' },
             'банковская карта (рф)': {
                 url: 'https://mironline.ru/',
@@ -1646,9 +1650,13 @@
                         if (idx === 0 || !row.values) return;
                         const paymentCell = row.values[1];
                         if (paymentCell && paymentCell.hyperlink) {
-                            const paymentName = (paymentCell.userEnteredValue?.stringValue || '').toLowerCase();
+                            const paymentName = (
+                                paymentCell.formattedValue ||
+                                paymentCell.userEnteredValue?.stringValue ||
+                                ''
+                            ).toLowerCase().trim();
+                            if (!paymentName) return;
                             appState.paymentUrls[paymentName] = paymentCell.hyperlink;
-                            console.log(`Загруженная ссылка для ${paymentName}: ${paymentCell.hyperlink}`);
                         }
                     });
                 }
@@ -2098,6 +2106,7 @@
                     const img = document.createElement('img');
                     img.src = iconSrc;
                     img.alt = '';
+                    img.referrerPolicy = 'no-referrer';
                     img.className = meta.wideIcon ? 'payment-chip-icon is-wide' : 'payment-chip-icon';
                     img.onerror = function() { this.remove(); };
                     chip.appendChild(img);
@@ -2170,6 +2179,7 @@
                                 const img = document.createElement('img');
                                 img.src = iconSrc;
                                 img.alt = '';
+                                img.referrerPolicy = 'no-referrer';
                                 img.style.width = meta.wideIcon ? '26px' : '16px';
                                 img.style.height = meta.wideIcon ? '14px' : '16px';
                                 img.style.objectFit = 'contain';
