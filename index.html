@@ -558,7 +558,15 @@
             border-radius: 4px;
             flex-shrink: 0;
             background: #fff;
+            object-fit: contain;
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
+        }
+
+        .payment-chip-icon.is-wide {
+            width: 26px;
+            height: 14px;
+            border-radius: 3px;
+            padding: 1px 2px;
         }
 
         .empty-value {
@@ -1571,7 +1579,12 @@
             'litecoin': { url: 'https://litecoin.org/', color: '#345d9d' },
             'dogecoin': { url: 'https://dogecoin.com/', color: '#c2a633' },
             'сбп': { url: 'https://sbp.nspk.ru/', color: '#1f7f54' },
-            'банковская карта (рф)': { url: '', color: '#1a1f71' }
+            'банковская карта (рф)': {
+                url: 'https://mironline.ru/',
+                color: '#0f754e',
+                wideIcon: true,
+                icon: 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120"><linearGradient id="a" x1="370" x2="290" gradientUnits="userSpaceOnUse"><stop stop-color="#1F5CD7"/><stop stop-color="#02AEFF" offset="1"/></linearGradient><path d="m31 13h33c3 0 12-1 16 13 3 9 7 23 13 44h2c6-22 11-37 13-44 4-14 14-13 18-13h31v96h-32v-57h-2l-17 57h-24l-17-57h-3v57h-31m139-96h32v57h3l21-47c4-9 13-10 13-10h30v96h-32v-57h-2l-21 47c-4 9-14 10-14 10h-30m142-29v29h-30v-50h98c-4 12-18 21-34 21" fill="#0f754e"/><path d="m382 53c4-18-8-40-34-40h-68c2 21 20 40 39 40" fill="url(#a)"/></svg>')
+            }
         };
 
         function seedPaymentCatalog() {
@@ -1585,7 +1598,9 @@
             const catalog = PAYMENT_CATALOG[lower] || Object.entries(PAYMENT_CATALOG).find(([key]) => lower.includes(key))?.[1];
             return {
                 url: appState.paymentUrls[lower] || catalog?.url || '',
-                color: catalog?.color || '#64748b'
+                color: catalog?.color || '#64748b',
+                icon: catalog?.icon || '',
+                wideIcon: Boolean(catalog?.wideIcon)
             };
         }
         const TABLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1897875028';
@@ -2071,14 +2086,21 @@
                     chip.href = meta.url;
                     chip.target = '_blank';
                     chip.rel = 'noopener noreferrer nofollow';
+                }
+
+                let iconSrc = meta.icon || '';
+                if (!iconSrc && meta.url) {
                     try {
-                        const img = document.createElement('img');
-                        img.src = `https://www.google.com/s2/favicons?sz=32&domain=${new URL(meta.url).hostname}`;
-                        img.alt = '';
-                        img.className = 'payment-chip-icon';
-                        img.onerror = function() { this.remove(); };
-                        chip.appendChild(img);
+                        iconSrc = `https://www.google.com/s2/favicons?sz=32&domain=${new URL(meta.url).hostname}`;
                     } catch (_) { /* keep chip without favicon */ }
+                }
+                if (iconSrc) {
+                    const img = document.createElement('img');
+                    img.src = iconSrc;
+                    img.alt = '';
+                    img.className = meta.wideIcon ? 'payment-chip-icon is-wide' : 'payment-chip-icon';
+                    img.onerror = function() { this.remove(); };
+                    chip.appendChild(img);
                 }
 
                 const label = document.createElement('span');
