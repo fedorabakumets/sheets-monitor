@@ -46,6 +46,7 @@ Thumbs.db
 *.json
 !appsscript.json
 !package.json
+!.cursor/environment.json
 
 # Replit specific
 attached_assets/

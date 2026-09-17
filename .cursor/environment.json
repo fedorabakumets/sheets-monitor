@@ -1,0 +1,16 @@
+{
+  "name": "Sheets Monitor",
+  "install": "python3 --version",
+  "terminals": [
+    {
+      "name": "Main Site (Port 5000)",
+      "command": "python3 server.py"
+    }
+  ],
+  "ports": [
+    {
+      "name": "Main Site",
+      "port": 5000
+    }
+  ]
+}
