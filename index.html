@@ -2506,6 +2506,8 @@
                     }
                     updateViewButton();
                 }
+                const cardSortHeaders = document.getElementById('cardSortHeaders');
+                if (cardSortHeaders) cardSortHeaders.style.display = appState.view === 'cards' ? 'flex' : 'none';
                 updateCardColumnsUI();
                 document.querySelectorAll('.filter-toggle').forEach(toggle => {
                     toggle.addEventListener('click', () => {
