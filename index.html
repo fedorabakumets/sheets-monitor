@@ -564,10 +564,13 @@
         }
 
         [data-theme="dark"] .payment-chip,
-        [data-theme="dark"] a.payment-chip {
+        [data-theme="dark"] a.payment-chip,
+        [data-theme="dark"] td a.payment-chip,
+        [data-theme="dark"] td a.payment-chip:hover {
             background: color-mix(in srgb, var(--chip-color, #94a3b8) 26%, #2a2a2a);
             color: #f1f5f9;
             border-color: color-mix(in srgb, var(--chip-color, #94a3b8) 40%, transparent);
+            text-shadow: none;
         }
 
         [data-theme="dark"] .payment-chip:hover,
