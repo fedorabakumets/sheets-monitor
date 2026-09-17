@@ -654,7 +654,7 @@
             width: 100%;
             height: 100%;
             max-width: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: top center;
             display: block;
         }
@@ -1764,9 +1764,9 @@
 
             const img = document.createElement('img');
             const cols = appState.cardColumns || 2;
-            const small = `https://image.thum.io/get/width/480/crop/300/noanimate/${pageUrl}`;
-            const medium = `https://image.thum.io/get/width/720/crop/405/noanimate/${pageUrl}`;
-            const large = `https://image.thum.io/get/width/1080/crop/608/noanimate/${pageUrl}`;
+            const small = `https://image.thum.io/get/viewportWidth/1600/width/480/crop/300/noanimate/${pageUrl}`;
+            const medium = `https://image.thum.io/get/viewportWidth/1600/width/720/crop/450/noanimate/${pageUrl}`;
+            const large = `https://image.thum.io/get/viewportWidth/1600/width/1080/crop/675/noanimate/${pageUrl}`;
             img.src = cols === 3 ? small : cols === 1 ? large : medium;
             img.srcset = `${small} 480w, ${medium} 720w, ${large} 1080w`;
             img.sizes = cols === 1
