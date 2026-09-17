@@ -493,6 +493,109 @@
         .payment-wise { background: #347EFF; }
         .payment-stripe { background: #635BFF; }
 
+        .payment-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            max-width: 280px;
+        }
+
+        .payment-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 5px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--chip-color, #64748b) 14%, #ffffff);
+            border: 1px solid color-mix(in srgb, var(--chip-color, #64748b) 28%, transparent);
+            color: #1e293b;
+            font-size: 0.75rem;
+            font-weight: 650;
+            letter-spacing: 0.01em;
+            line-height: 1.2;
+            text-decoration: none;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        a.payment-chip {
+            color: #1e293b;
+        }
+
+        td a.payment-chip,
+        td a.payment-chip:hover {
+            color: #1e293b;
+            text-shadow: none;
+        }
+
+        td a.payment-chip:hover {
+            color: #0f172a;
+        }
+
+        .payment-chip:hover {
+            transform: translateY(-1px);
+            background: color-mix(in srgb, var(--chip-color, #64748b) 22%, #ffffff);
+            box-shadow: 0 4px 10px color-mix(in srgb, var(--chip-color, #64748b) 28%, transparent);
+            color: #0f172a;
+            text-shadow: none;
+        }
+
+        .payment-chip-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            background: #fff;
+            box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
+        }
+
+        .payment-empty {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px dashed #cbd5e1;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-style: italic;
+            background: #f8fafc;
+        }
+
+        [data-theme="dark"] .payment-chip,
+        [data-theme="dark"] a.payment-chip,
+        [data-theme="dark"] td a.payment-chip,
+        [data-theme="dark"] td a.payment-chip:hover {
+            background: color-mix(in srgb, var(--chip-color, #94a3b8) 26%, #2a2a2a);
+            color: #f1f5f9;
+            border-color: color-mix(in srgb, var(--chip-color, #94a3b8) 40%, transparent);
+            text-shadow: none;
+        }
+
+        [data-theme="dark"] .payment-chip:hover,
+        [data-theme="dark"] a.payment-chip:hover {
+            color: #fff;
+            background: color-mix(in srgb, var(--chip-color, #94a3b8) 36%, #222);
+        }
+
+        [data-theme="dark"] .payment-empty {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: #555;
+            color: #9aa3ad;
+        }
+
+        .cards-view .payment-chips {
+            max-width: 100%;
+        }
+
+        .cards-view table tbody td a.payment-chip,
+        .cards-view table tbody td .payment-chip span {
+            color: inherit;
+            font-size: inherit;
+            word-break: normal;
+        }
+
         .site-cell {
             display: flex;
             flex-direction: column;
@@ -1056,6 +1159,7 @@
         }
 
         a.payment-link::after,
+        a.payment-chip::after,
         a.tg-discuss-link::after {
             content: '';
             display: none !important;
@@ -1195,6 +1299,42 @@
         const PAYMENTS_COL = 4;
         const WORK_COL = 5;
         const DIFFICULTY_ORDER = { Легкая: 1, Средняя: 2, Сложная: 3 };
+        const PAYMENT_CATALOG = {
+            'paypal': { url: 'https://www.paypal.com/', color: '#003087' },
+            'webmoney': { url: 'https://webmoney.com/', color: '#036ea7' },
+            'volet': { url: 'https://volet.com/', color: '#6c63ff' },
+            'payeer': { url: 'https://payeer.com/', color: '#1a8c3e' },
+            'юmoney': { url: 'https://yoomoney.ru/', color: '#8b3ffd' },
+            'yoomoney': { url: 'https://yoomoney.ru/', color: '#8b3ffd' },
+            'epayments': { url: 'https://www.epayments.com/', color: '#00a0e3' },
+            'perfect money': { url: 'https://perfectmoney.cc/', color: '#c41e3a' },
+            'usdt': { url: 'https://tether.to/', color: '#26a17b' },
+            'trx': { url: 'https://tron.network/', color: '#eb0029' },
+            'telegram stars': { url: 'https://telegram.org/', color: '#229ed9' },
+            'bitcoin': { url: 'https://bitcoin.org/', color: '#f7931a' },
+            'skrill': { url: 'https://www.skrill.com/', color: '#862165' },
+            'paxum': { url: 'https://paxum.com/', color: '#00a651' },
+            'okpay': { url: 'http://okpay.co/', color: '#334155' },
+            'litecoin': { url: 'https://litecoin.org/', color: '#345d9d' },
+            'dogecoin': { url: 'https://dogecoin.com/', color: '#c2a633' },
+            'сбп': { url: 'https://sbp.nspk.ru/', color: '#1f7f54' },
+            'банковская карта (рф)': { url: '', color: '#1a1f71' }
+        };
+
+        function seedPaymentCatalog() {
+            Object.entries(PAYMENT_CATALOG).forEach(([key, meta]) => {
+                if (meta.url && !appState.paymentUrls[key]) appState.paymentUrls[key] = meta.url;
+            });
+        }
+
+        function getPaymentMeta(paymentName) {
+            const lower = (paymentName || '').toLowerCase().trim();
+            const catalog = PAYMENT_CATALOG[lower] || Object.entries(PAYMENT_CATALOG).find(([key]) => lower.includes(key))?.[1];
+            return {
+                url: appState.paymentUrls[lower] || catalog?.url || '',
+                color: catalog?.color || '#64748b'
+            };
+        }
         const TABLE_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1897875028';
         const FILTERS_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1897875028';
         const CHANGES_CSV_URL = 'https://docs.google.com/spreadsheets/d/1-_Qzi00wtezoZSnNiAhgvXJFhBE4x7LhyihTHtZgXv4/export?format=csv&gid=1531258534';
@@ -1250,10 +1390,10 @@
         }
 
         async function loadPaymentUrls() {
-            // Попыткаемся загрузить через API, если не сработает - используем CSV способ
+            seedPaymentCatalog();
             const apiSuccess = await loadPaymentUrlsViaAPI();
             if (!apiSuccess) {
-                console.log('Используется CSV способ без гиперссылок');
+                console.log('Используется каталог платежек без Google Sheets API');
             }
         }
 
@@ -1540,53 +1680,43 @@
         }
 
         function createPaymentIconsElement(value) {
-            if (!value || !value.trim()) return document.createTextNode('Не указано');
-            const container = document.createElement('span');
-            container.style.display = 'flex';
-            container.style.flexWrap = 'wrap';
-            container.style.gap = '10px';
-            container.style.alignItems = 'center';
-            
-            const payments = value.split(',').map(p => p.trim()).filter(p => p);
-            
-            payments.forEach((payment, idx) => {
-                const url = appState.paymentUrls[payment.toLowerCase()];
-                const wrapper = document.createElement('span');
-                wrapper.style.display = 'flex';
-                wrapper.style.alignItems = 'center';
-                wrapper.style.gap = '6px';
-                
-                if (url) {
-                    // Иконка
-                    const img = document.createElement('img');
-                    img.src = `https://www.google.com/s2/favicons?sz=20&domain=${new URL(url).hostname}`;
-                    img.alt = payment;
-                    img.style.width = '20px';
-                    img.style.height = '20px';
-                    img.style.borderRadius = '3px';
-                    img.style.flexShrink = '0';
-                    img.onerror = function() { this.style.display = 'none'; };
-                    wrapper.appendChild(img);
-                    
-                    // Ссылка
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                    link.textContent = escapeHTML(payment);
-                    link.style.color = '#0066cc';
-                    link.style.textDecoration = 'none';
-                    link.className = 'payment-link';
-                    wrapper.appendChild(link);
-                } else {
-                    const text = document.createElement('span');
-                    text.textContent = escapeHTML(payment);
-                    wrapper.appendChild(text);
+            if (!value || !value.trim()) {
+                const empty = document.createElement('span');
+                empty.className = 'payment-empty';
+                empty.textContent = 'Не указано';
+                return empty;
+            }
+
+            const container = document.createElement('div');
+            container.className = 'payment-chips';
+
+            value.split(',').map(p => p.trim()).filter(Boolean).forEach(payment => {
+                const meta = getPaymentMeta(payment);
+                const chip = meta.url ? document.createElement('a') : document.createElement('span');
+                chip.className = 'payment-chip';
+                chip.style.setProperty('--chip-color', meta.color);
+                chip.title = payment;
+
+                if (meta.url) {
+                    chip.href = meta.url;
+                    chip.target = '_blank';
+                    chip.rel = 'noopener noreferrer nofollow';
+                    try {
+                        const img = document.createElement('img');
+                        img.src = `https://www.google.com/s2/favicons?sz=32&domain=${new URL(meta.url).hostname}`;
+                        img.alt = '';
+                        img.className = 'payment-chip-icon';
+                        img.onerror = function() { this.remove(); };
+                        chip.appendChild(img);
+                    } catch (_) { /* keep chip without favicon */ }
                 }
-                
-                container.appendChild(wrapper);
+
+                const label = document.createElement('span');
+                label.textContent = payment;
+                chip.appendChild(label);
+                container.appendChild(chip);
             });
-            
+
             return container;
         }
 
