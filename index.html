@@ -1065,6 +1065,60 @@
             box-shadow: 0 0 15px rgba(0, 102, 204, 0.7);
         }
 
+        .card-columns-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 6px 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 2px 8px rgba(0, 102, 204, 0.18);
+        }
+
+        .card-columns-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+        }
+
+        .card-columns-btn {
+            min-width: 34px;
+            height: 32px;
+            padding: 0 8px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #334155;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .card-columns-btn:hover {
+            background: rgba(0, 102, 204, 0.12);
+        }
+
+        .card-columns-btn.is-active {
+            background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 102, 204, 0.35);
+        }
+
+        [data-theme="dark"] .card-columns-control {
+            background: rgba(0, 0, 0, 0.35);
+        }
+
+        [data-theme="dark"] .card-columns-label,
+        [data-theme="dark"] .card-columns-btn {
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .card-columns-btn.is-active {
+            background: linear-gradient(135deg, #00ff99 0%, #00cc7a 100%);
+            color: #000;
+        }
+
         /* Card Sort Headers */
         .card-sort-headers {
             display: flex;
@@ -1135,14 +1189,20 @@
         }
 
         .cards-view table tbody {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(var(--card-cols, 2), minmax(0, 1fr));
             gap: 15px;
+            width: 100%;
+        }
+
+        .cards-view[data-card-cols="1"] table tbody {
+            max-width: 560px;
+            margin: 0 auto;
         }
 
         .card-column {
-            flex: 1;
-            min-width: 300px;
+            min-width: 0;
+            width: 100%;
         }
 
         .cards-view table tbody tr {
@@ -1263,7 +1323,10 @@
 
         @media (max-width: 768px) {
             .card-column {
-                min-width: 100%;
+                min-width: 0;
+            }
+            .card-columns-label {
+                display: none;
             }
         }
     </style>
@@ -1317,6 +1380,12 @@
             <button id="toggleViewBtn" class="view-toggle-btn" aria-label="Переключить вид">
                 <i class="fas fa-th"></i> Карточки
             </button>
+            <div id="cardColumnsControl" class="card-columns-control" hidden role="group" aria-label="Карточек в ряд">
+                <span class="card-columns-label">В ряд</span>
+                <button type="button" class="card-columns-btn" data-cols="1" aria-label="1 карточка в ряд">1</button>
+                <button type="button" class="card-columns-btn" data-cols="2" aria-label="2 карточки в ряд">2</button>
+                <button type="button" class="card-columns-btn" data-cols="3" aria-label="3 карточки в ряд">3</button>
+            </div>
             <select id="themeSwitch" aria-label="Выбор темы">
                 <option value="light">Светлая</option>
                 <option value="dark">Темная</option>
@@ -1421,6 +1490,7 @@
             locale: 'ru-RU',
             theme: 'light',
             view: 'table',
+            cardColumns: 2,
             user: null,
             page: 1,
             rowsPerPage: 10,
@@ -1480,10 +1550,29 @@
                     tableSection.classList.toggle('cards-view', appState.view === 'cards');
                     tableSection.style.opacity = '1';
                     localStorage.setItem('view', appState.view);
+                    updateCardColumnsUI();
                     renderTable();
                     updateViewButton();
                 }, 300);
             }
+        }
+
+        function setCardColumns(count) {
+            const cols = Number(count);
+            appState.cardColumns = [1, 2, 3].includes(cols) ? cols : 2;
+            localStorage.setItem('cardColumns', String(appState.cardColumns));
+            updateCardColumnsUI();
+            if (appState.view === 'cards') renderTable();
+        }
+
+        function updateCardColumnsUI() {
+            const control = document.getElementById('cardColumnsControl');
+            const tableSection = document.querySelector('.table-section');
+            if (control) control.hidden = appState.view !== 'cards';
+            if (tableSection) tableSection.dataset.cardCols = String(appState.cardColumns);
+            document.querySelectorAll('.card-columns-btn').forEach(btn => {
+                btn.classList.toggle('is-active', Number(btn.dataset.cols) === appState.cardColumns);
+            });
         }
 
         function updateViewButton() {
@@ -1740,9 +1829,11 @@
             const paginatedData = appState.tableData.slice(start, end);
 
             if (appState.view === 'cards') {
-                const columns = [[], []];
+                const cols = appState.cardColumns || 2;
+                tbody.style.setProperty('--card-cols', String(cols));
+                const columns = Array.from({ length: cols }, () => []);
                 paginatedData.forEach((row, index) => {
-                    columns[index % 2].push(row);
+                    columns[index % cols].push(row);
                 });
 
                 columns.forEach((columnData) => {
@@ -1752,6 +1843,7 @@
                     tbody.appendChild(colDiv);
                 });
             } else {
+                tbody.style.removeProperty('--card-cols');
                 paginatedData.forEach(row => appendDataRow(tbody, row));
             }
             animateRows(tbody);
@@ -2399,8 +2491,13 @@
                 document.getElementById('fontSizeDecrease').addEventListener('click', () => adjustFontSize(-0.1));
                 document.getElementById('themeToggleMobile').addEventListener('click', () => setTheme(appState.theme === 'light' ? 'dark' : 'light'));
                 document.getElementById('toggleViewBtn')?.addEventListener('click', toggleView);
+                document.querySelectorAll('.card-columns-btn').forEach(btn => {
+                    btn.addEventListener('click', () => setCardColumns(btn.dataset.cols));
+                });
 
                 const savedView = localStorage.getItem('view') || 'table';
+                const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
+                appState.cardColumns = [1, 2, 3].includes(savedCols) ? savedCols : 2;
                 if (savedView !== appState.view) {
                     appState.view = savedView;
                     const tableSection = document.querySelector('.table-section');
@@ -2409,6 +2506,7 @@
                     }
                     updateViewButton();
                 }
+                updateCardColumnsUI();
                 document.querySelectorAll('.filter-toggle').forEach(toggle => {
                     toggle.addEventListener('click', () => {
                         const filterSection = toggle.closest('.filter-section');
@@ -2429,6 +2527,7 @@
                     const currentTheme = localStorage.getItem('theme');
                     const currentFontSize = localStorage.getItem('fontSize');
                     const currentView = localStorage.getItem('view');
+                    const currentCardColumns = localStorage.getItem('cardColumns');
                     
                     localStorage.clear();
                     
@@ -2436,6 +2535,7 @@
                     if (currentTheme) localStorage.setItem('theme', currentTheme);
                     if (currentFontSize) localStorage.setItem('fontSize', currentFontSize);
                     if (currentView) localStorage.setItem('view', currentView);
+                    if (currentCardColumns) localStorage.setItem('cardColumns', currentCardColumns);
                     
                     setTimeout(() => location.reload(), 500);
                 });
