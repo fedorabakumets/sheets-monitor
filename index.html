@@ -447,6 +447,15 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .site-link-with-icon a {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .site-icon {
@@ -690,6 +699,8 @@
             font-size: 0.82em;
             text-decoration: none;
             white-space: nowrap;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .tg-discuss-link:hover {
@@ -698,7 +709,12 @@
         }
 
         .tg-discuss-link i {
+            flex-shrink: 0;
             font-size: 1.1em;
+        }
+
+        .tg-discuss-short {
+            display: none;
         }
 
         td a.tg-discuss-link {
@@ -713,14 +729,40 @@
         }
 
         [data-theme="dark"] td a.tg-discuss-link,
-        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link {
+        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link,
+        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link span {
             color: #5ec8f0;
         }
 
-        .cards-view table tbody td a.tg-discuss-link {
+        .cards-view table tbody td a.tg-discuss-link,
+        .cards-view table tbody td a.tg-discuss-link span {
             color: #229ED9;
             font-weight: 600;
             font-size: 0.85em;
+            word-break: normal;
+            overflow-wrap: normal;
+        }
+
+        @container bux-card (max-width: 220px) {
+            .tg-discuss-full {
+                display: none;
+            }
+            .tg-discuss-short {
+                display: inline;
+            }
+        }
+
+        @container bux-card (max-width: 132px) {
+            .tg-discuss-full,
+            .tg-discuss-short {
+                display: none;
+            }
+            .tg-discuss-link {
+                gap: 0;
+            }
+            .tg-discuss-link i {
+                font-size: 1.25em;
+            }
         }
 
         td a {
@@ -1227,6 +1269,8 @@
         .cards-view table tbody tr {
             display: grid;
             grid-template-columns: 1fr;
+            container-type: inline-size;
+            container-name: bux-card;
             margin-bottom: 0;
             border: 2px solid #0066cc;
             border-radius: 10px;
@@ -1322,6 +1366,11 @@
             grid-column: 1;
             border-bottom: none;
             padding-bottom: 0;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: normal;
         }
 
         .cards-view table tbody td:first-child a.site-screenshot-link {
@@ -1761,8 +1810,16 @@
             const icon = document.createElement('i');
             icon.className = 'fab fa-telegram-plane';
             icon.setAttribute('aria-hidden', 'true');
+            const full = document.createElement('span');
+            full.className = 'tg-discuss-full';
+            full.textContent = 'Обсудить в Telegram';
+            const short = document.createElement('span');
+            short.className = 'tg-discuss-short';
+            short.textContent = 'Обсудить';
+            short.setAttribute('aria-hidden', 'true');
             link.appendChild(icon);
-            link.appendChild(document.createTextNode(' Обсудить в Telegram'));
+            link.appendChild(full);
+            link.appendChild(short);
             return link;
         }
 
