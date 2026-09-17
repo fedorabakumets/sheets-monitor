@@ -2159,13 +2159,20 @@
                         label.appendChild(input);
                         
                         if (type === 'payment') {
-                            const url = appState.paymentUrls[item.toLowerCase()];
-                            if (url) {
+                            const meta = getPaymentMeta(item);
+                            let iconSrc = meta.icon || '';
+                            if (!iconSrc && meta.url) {
+                                try {
+                                    iconSrc = `https://www.google.com/s2/favicons?sz=16&domain=${new URL(meta.url).hostname}`;
+                                } catch (_) { /* keep label without favicon */ }
+                            }
+                            if (iconSrc) {
                                 const img = document.createElement('img');
-                                img.src = `https://www.google.com/s2/favicons?sz=16&domain=${new URL(url).hostname}`;
-                                img.alt = item;
-                                img.style.width = '16px';
-                                img.style.height = '16px';
+                                img.src = iconSrc;
+                                img.alt = '';
+                                img.style.width = meta.wideIcon ? '26px' : '16px';
+                                img.style.height = meta.wideIcon ? '14px' : '16px';
+                                img.style.objectFit = 'contain';
                                 img.style.borderRadius = '2px';
                                 img.onerror = function() { this.style.display = 'none'; };
                                 label.appendChild(img);
