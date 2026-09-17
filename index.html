@@ -1747,37 +1747,33 @@
 
         function createLinkElement(text) {
             if (!text || !text.trim()) return document.createTextNode('');
-            const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+|[^\s]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/gi;
-            const match = text.match(urlPattern);
-            if (match) {
-                let url = match[0];
+            const url = getSiteReferralUrl(text);
+            if (url) {
                 try {
-                    url = url.match(/^[a-zA-Z]+:\/\//) ? url : `${DEFAULT_PROTOCOL}${url}`;
-                    new URL(url);
                     const domainMatch = url.match(/^(?:https?:\/\/)?(?:www\.)?([^\/]+)/i);
                     const domain = domainMatch ? domainMatch[1] : url;
                     const displayText = shortenSiteName(domain);
-                    
+
                     const container = document.createElement('span');
                     container.className = 'site-link-with-icon';
-                    
+
                     const img = document.createElement('img');
                     img.src = `https://www.google.com/s2/favicons?sz=32&domain=${domain}`;
                     img.alt = displayText;
                     img.className = 'site-icon';
                     img.onerror = function() { this.style.display = 'none'; };
                     container.appendChild(img);
-                    
+
                     const link = document.createElement('a');
                     link.href = url;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer nofollow';
-                    link.textContent = escapeHTML(displayText);
+                    link.textContent = displayText;
                     link.setAttribute('aria-label', `Visit ${displayText}`);
                     link.dataset.tooltip = url;
                     link.style.fontWeight = 'bold';
                     container.appendChild(link);
-                    
+
                     return container;
                 } catch {
                     return document.createTextNode(escapeHTML(text));
@@ -1818,11 +1814,25 @@
             return link;
         }
 
-        function getSitePageUrl(text) {
-            const match = (text || '').match(/https?:\/\/[^\s,]+/i);
+        function getSiteReferralUrl(text) {
+            if (!text || !text.trim()) return '';
+            const urlPattern = /(https?:\/\/[^\s,]+|www\.[^\s,]+|[^\s,]+\.[a-zA-Z]{2,}(?:\/[^\s,]*)?)/i;
+            const match = text.match(urlPattern);
             if (!match) return '';
             try {
-                const parsed = new URL(match[0]);
+                let url = match[0];
+                url = url.match(/^[a-zA-Z]+:\/\//) ? url : `${DEFAULT_PROTOCOL}${url}`;
+                return new URL(url).href;
+            } catch {
+                return '';
+            }
+        }
+
+        function getSitePageUrl(text) {
+            const referralUrl = getSiteReferralUrl(text);
+            if (!referralUrl) return '';
+            try {
+                const parsed = new URL(referralUrl);
                 return `${parsed.protocol}//${parsed.host}/`;
             } catch {
                 return '';
@@ -1831,14 +1841,15 @@
 
         function createSiteScreenshot(siteText) {
             const pageUrl = getSitePageUrl(siteText);
-            if (!pageUrl) return null;
+            const referralUrl = getSiteReferralUrl(siteText) || pageUrl;
+            if (!pageUrl || !referralUrl) return null;
 
             const link = document.createElement('a');
             link.className = 'site-screenshot-link';
-            link.href = pageUrl;
+            link.href = referralUrl;
             link.target = '_blank';
             link.rel = 'noopener noreferrer nofollow';
-            link.setAttribute('aria-label', 'Открыть скриншот и сайт');
+            link.setAttribute('aria-label', 'Открыть сайт');
 
             const frame = document.createElement('span');
             frame.className = 'site-screenshot';
