@@ -561,7 +561,7 @@
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
         }
 
-        .payment-empty {
+        .empty-value {
             display: inline-flex;
             align-items: center;
             padding: 4px 10px;
@@ -570,7 +570,9 @@
             color: #94a3b8;
             font-size: 0.78rem;
             font-style: italic;
+            font-weight: 500;
             background: #f8fafc;
+            white-space: nowrap;
         }
 
         [data-theme="dark"] .payment-chip,
@@ -589,7 +591,7 @@
             background: color-mix(in srgb, var(--chip-color, #94a3b8) 36%, #222);
         }
 
-        [data-theme="dark"] .payment-empty {
+        [data-theme="dark"] .empty-value {
             background: rgba(255, 255, 255, 0.04);
             border-color: #555;
             color: #9aa3ad;
@@ -604,6 +606,17 @@
             color: inherit;
             font-size: inherit;
             word-break: normal;
+        }
+
+        .cards-view table tbody td .empty-value {
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .cards-view table tbody td .empty-value {
+            color: #9aa3ad;
         }
 
         .site-cell {
@@ -2018,12 +2031,16 @@
             return { icon: '<i class="fas fa-circle"></i>', bg: 'payment-card', url: '#' };
         }
 
+        function createEmptyValue() {
+            const empty = document.createElement('span');
+            empty.className = 'empty-value';
+            empty.textContent = 'Не указано';
+            return empty;
+        }
+
         function createPaymentIconsElement(value) {
             if (!value || !value.trim()) {
-                const empty = document.createElement('span');
-                empty.className = 'payment-empty';
-                empty.textContent = 'Не указано';
-                return empty;
+                return createEmptyValue();
             }
 
             const container = document.createElement('div');
@@ -2059,12 +2076,15 @@
             return container;
         }
 
-        function createTableCell(value, label, creator = (val => document.createTextNode(escapeHTML(val || 'Не указано')))) {
+        function createTableCell(value, label, creator = (val => document.createTextNode(escapeHTML(val)))) {
             const td = document.createElement('td');
             td.setAttribute('data-label', label);
-            
+            const isEmpty = value == null || (typeof value === 'string' && !value.trim());
+
             if (label === 'Платежные системы') {
                 td.appendChild(createPaymentIconsElement(value));
+            } else if (isEmpty) {
+                td.appendChild(createEmptyValue());
             } else {
                 td.appendChild(creator(value));
             }
