@@ -644,7 +644,9 @@
             aspect-ratio: 16 / 9;
         }
 
-        .cards-view[data-card-cols="3"] .site-screenshot {
+        .cards-view[data-card-cols="3"] .site-screenshot,
+        .cards-view[data-card-cols="4"] .site-screenshot,
+        .cards-view[data-card-cols="5"] .site-screenshot {
             aspect-ratio: 16 / 10;
         }
 
@@ -1099,9 +1101,9 @@
         }
 
         .card-columns-btn {
-            min-width: 34px;
+            min-width: 28px;
             height: 32px;
-            padding: 0 8px;
+            padding: 0 6px;
             border: none;
             border-radius: 6px;
             background: transparent;
@@ -1344,8 +1346,17 @@
         }
 
 
+        @media (max-width: 1200px) {
+            .cards-view[data-card-cols="4"] table tbody,
+            .cards-view[data-card-cols="5"] table tbody {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
         @media (max-width: 900px) {
-            .cards-view[data-card-cols="3"] table tbody {
+            .cards-view[data-card-cols="3"] table tbody,
+            .cards-view[data-card-cols="4"] table tbody,
+            .cards-view[data-card-cols="5"] table tbody {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         }
@@ -1360,7 +1371,9 @@
             .cards-view table tbody,
             .cards-view[data-card-cols="1"] table tbody,
             .cards-view[data-card-cols="2"] table tbody,
-            .cards-view[data-card-cols="3"] table tbody {
+            .cards-view[data-card-cols="3"] table tbody,
+            .cards-view[data-card-cols="4"] table tbody,
+            .cards-view[data-card-cols="5"] table tbody {
                 grid-template-columns: 1fr;
                 max-width: 100%;
             }
@@ -1437,6 +1450,8 @@
                 <button type="button" class="card-columns-btn" data-cols="1" aria-label="1 карточка в ряд">1</button>
                 <button type="button" class="card-columns-btn" data-cols="2" aria-label="2 карточки в ряд">2</button>
                 <button type="button" class="card-columns-btn" data-cols="3" aria-label="3 карточки в ряд">3</button>
+                <button type="button" class="card-columns-btn" data-cols="4" aria-label="4 карточки в ряд">4</button>
+                <button type="button" class="card-columns-btn" data-cols="5" aria-label="5 карточек в ряд">5</button>
             </div>
             <select id="themeSwitch" aria-label="Выбор темы">
                 <option value="light">Светлая</option>
@@ -1543,6 +1558,7 @@
             theme: 'light',
             view: 'table',
             cardColumns: 2,
+            cardColumnsMax: 5,
             user: null,
             page: 1,
             rowsPerPage: 10,
@@ -1611,7 +1627,8 @@
 
         function setCardColumns(count) {
             const cols = Number(count);
-            appState.cardColumns = [1, 2, 3].includes(cols) ? cols : 2;
+            const max = appState.cardColumnsMax || 5;
+            appState.cardColumns = (cols >= 1 && cols <= max) ? cols : 2;
             localStorage.setItem('cardColumns', String(appState.cardColumns));
             updateCardColumnsUI();
             if (appState.view === 'cards') renderTable();
@@ -1767,13 +1784,15 @@
             const small = `https://image.thum.io/get/viewportWidth/1440/width/480/crop/900/noanimate/${pageUrl}`;
             const medium = `https://image.thum.io/get/viewportWidth/1440/width/720/crop/900/noanimate/${pageUrl}`;
             const large = `https://image.thum.io/get/viewportWidth/1440/width/1080/crop/900/noanimate/${pageUrl}`;
-            img.src = cols === 3 ? small : cols === 1 ? large : medium;
+            img.src = cols >= 3 ? small : cols === 1 ? large : medium;
             img.srcset = `${small} 480w, ${medium} 720w, ${large} 1080w`;
             img.sizes = cols === 1
                 ? '(max-width: 768px) calc(100vw - 32px), 720px'
-                : cols === 3
-                    ? '(max-width: 768px) calc(100vw - 32px), (max-width: 1100px) 45vw, 30vw'
-                    : '(max-width: 768px) calc(100vw - 32px), 45vw';
+                : cols >= 4
+                    ? '(max-width: 768px) calc(100vw - 32px), (max-width: 1200px) 30vw, 18vw'
+                    : cols === 3
+                        ? '(max-width: 768px) calc(100vw - 32px), (max-width: 1100px) 45vw, 30vw'
+                        : '(max-width: 768px) calc(100vw - 32px), 45vw';
             img.alt = `Скриншот ${pageUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}`;
             img.loading = 'lazy';
             img.decoding = 'async';
@@ -2559,7 +2578,8 @@
 
                 const savedView = localStorage.getItem('view') || 'table';
                 const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
-                appState.cardColumns = [1, 2, 3].includes(savedCols) ? savedCols : 2;
+                const max = appState.cardColumnsMax || 5;
+                appState.cardColumns = (savedCols >= 1 && savedCols <= max) ? savedCols : 2;
                 if (savedView !== appState.view) {
                     appState.view = savedView;
                     const tableSection = document.querySelector('.table-section');
