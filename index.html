@@ -713,10 +713,6 @@
             font-size: 1.1em;
         }
 
-        .tg-discuss-short {
-            display: none;
-        }
-
         td a.tg-discuss-link {
             color: #229ED9;
             font-weight: 600;
@@ -729,40 +725,26 @@
         }
 
         [data-theme="dark"] td a.tg-discuss-link,
-        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link,
-        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link span {
+        [data-theme="dark"] .cards-view table tbody td a.tg-discuss-link {
             color: #5ec8f0;
         }
 
-        .cards-view table tbody td a.tg-discuss-link,
-        .cards-view table tbody td a.tg-discuss-link span {
+        .cards-view table tbody td a.tg-discuss-link {
             color: #229ED9;
             font-weight: 600;
             font-size: 0.85em;
+            white-space: normal;
+            flex-wrap: wrap;
             word-break: normal;
-            overflow-wrap: normal;
+            overflow-wrap: break-word;
+            line-height: 1.25;
         }
 
-        @container bux-card (max-width: 220px) {
-            .tg-discuss-full {
-                display: none;
-            }
-            .tg-discuss-short {
-                display: inline;
-            }
-        }
-
-        @container bux-card (max-width: 132px) {
-            .tg-discuss-full,
-            .tg-discuss-short {
-                display: none;
-            }
-            .tg-discuss-link {
-                gap: 0;
-            }
-            .tg-discuss-link i {
-                font-size: 1.25em;
-            }
+        .cards-view table tbody td a.tg-discuss-link span {
+            color: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            white-space: normal;
         }
 
         td a {
@@ -1269,8 +1251,6 @@
         .cards-view table tbody tr {
             display: grid;
             grid-template-columns: 1fr;
-            container-type: inline-size;
-            container-name: bux-card;
             margin-bottom: 0;
             border: 2px solid #0066cc;
             border-radius: 10px;
@@ -1807,16 +1787,10 @@
             const icon = document.createElement('i');
             icon.className = 'fab fa-telegram-plane';
             icon.setAttribute('aria-hidden', 'true');
-            const full = document.createElement('span');
-            full.className = 'tg-discuss-full';
-            full.textContent = 'Обсудить в Telegram';
-            const short = document.createElement('span');
-            short.className = 'tg-discuss-short';
-            short.textContent = 'Обсудить';
-            short.setAttribute('aria-hidden', 'true');
+            const label = document.createElement('span');
+            label.textContent = 'Обсудить в Telegram';
             link.appendChild(icon);
-            link.appendChild(full);
-            link.appendChild(short);
+            link.appendChild(label);
             return link;
         }
 
