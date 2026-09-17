@@ -39,8 +39,11 @@
 ├── Code.gs                 # Google Apps Script (триггер)
 ├── appsscript.json         # Конфигурация скрипта
 ├── demo.gif                # Демонстрация приложения (GIF)
+├── telegram-mcp-deploy/    # Railway-деплой Telegram MCP и скрипты форума
 └── README.md               # Этот файл
 ```
+
+Документация форума и Railway MCP: [`telegram-mcp-deploy/README.md`](telegram-mcp-deploy/README.md). Там же пак логотипов топиков, аватарка группы и one-shot скрипты.
 
 ## 🔗 Google Sheets структура
 
