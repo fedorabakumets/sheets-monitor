@@ -124,9 +124,9 @@ def news_html(ids: dict[str, int]) -> str:
         "Последние изменения\n"
         "30.11.2025\n\n"
         "• Socpublic.com\n"
-        "платёжные системы → WebMoney, Advcash(Volet), Payeer, Epayments, Perfect Money\n\n"
+        "платёжные системы → WebMoney, Volet, Payeer, Epayments, Perfect Money\n\n"
         "• Wmrfast.com\n"
-        "платёжные системы → Perfect Money, Epayments, Advcash(Volet)\n"
+        "платёжные системы → Perfect Money, Epayments, Volet\n"
         "типы работы → Расширение, Тесты, Бонусы"
     )
 
