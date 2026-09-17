@@ -1818,11 +1818,21 @@
             return link;
         }
 
-        function getSitePageUrl(text) {
+        function getSiteReferralUrl(text) {
             const match = (text || '').match(/https?:\/\/[^\s,]+/i);
             if (!match) return '';
             try {
-                const parsed = new URL(match[0]);
+                return new URL(match[0]).href;
+            } catch {
+                return match[0];
+            }
+        }
+
+        function getSitePageUrl(text) {
+            const referralUrl = getSiteReferralUrl(text);
+            if (!referralUrl) return '';
+            try {
+                const parsed = new URL(referralUrl);
                 return `${parsed.protocol}//${parsed.host}/`;
             } catch {
                 return '';
@@ -1831,14 +1841,15 @@
 
         function createSiteScreenshot(siteText) {
             const pageUrl = getSitePageUrl(siteText);
-            if (!pageUrl) return null;
+            const referralUrl = getSiteReferralUrl(siteText) || pageUrl;
+            if (!pageUrl || !referralUrl) return null;
 
             const link = document.createElement('a');
             link.className = 'site-screenshot-link';
-            link.href = pageUrl;
+            link.href = referralUrl;
             link.target = '_blank';
             link.rel = 'noopener noreferrer nofollow';
-            link.setAttribute('aria-label', 'Открыть скриншот и сайт');
+            link.setAttribute('aria-label', 'Открыть сайт');
 
             const frame = document.createElement('span');
             frame.className = 'site-screenshot';
