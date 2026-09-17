@@ -435,23 +435,33 @@
         }
 
         table tbody tr:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+            transform: none;
+            box-shadow: none;
         }
 
         table tbody tr:hover td {
-            background: rgba(255, 245, 238, 0.9);
+            background: rgba(226, 240, 255, 0.95);
         }
 
         .site-link-with-icon {
             display: flex;
             align-items: center;
             gap: 6px;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .site-link-with-icon a {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .site-icon {
             width: 24px;
             height: 24px;
+            flex-shrink: 0;
             border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
@@ -551,7 +561,7 @@
             box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.06);
         }
 
-        .payment-empty {
+        .empty-value {
             display: inline-flex;
             align-items: center;
             padding: 4px 10px;
@@ -560,7 +570,9 @@
             color: #94a3b8;
             font-size: 0.78rem;
             font-style: italic;
+            font-weight: 500;
             background: #f8fafc;
+            white-space: nowrap;
         }
 
         [data-theme="dark"] .payment-chip,
@@ -579,7 +591,7 @@
             background: color-mix(in srgb, var(--chip-color, #94a3b8) 36%, #222);
         }
 
-        [data-theme="dark"] .payment-empty {
+        [data-theme="dark"] .empty-value {
             background: rgba(255, 255, 255, 0.04);
             border-color: #555;
             color: #9aa3ad;
@@ -594,6 +606,17 @@
             color: inherit;
             font-size: inherit;
             word-break: normal;
+        }
+
+        .cards-view table tbody td .empty-value {
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .cards-view table tbody td .empty-value {
+            color: #9aa3ad;
         }
 
         .site-cell {
@@ -645,8 +668,7 @@
         }
 
         .cards-view[data-card-cols="3"] .site-screenshot,
-        .cards-view[data-card-cols="4"] .site-screenshot,
-        .cards-view[data-card-cols="5"] .site-screenshot {
+        .cards-view[data-card-cols="4"] .site-screenshot {
             aspect-ratio: 16 / 10;
         }
 
@@ -690,6 +712,8 @@
             font-size: 0.82em;
             text-decoration: none;
             white-space: nowrap;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .tg-discuss-link:hover {
@@ -698,6 +722,7 @@
         }
 
         .tg-discuss-link i {
+            flex-shrink: 0;
             font-size: 1.1em;
         }
 
@@ -721,6 +746,18 @@
             color: #229ED9;
             font-weight: 600;
             font-size: 0.85em;
+            white-space: normal;
+            flex-wrap: wrap;
+            word-break: normal;
+            overflow-wrap: break-word;
+            line-height: 1.25;
+        }
+
+        .cards-view table tbody td a.tg-discuss-link span {
+            color: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            white-space: normal;
         }
 
         td a {
@@ -852,7 +889,7 @@
         }
 
         [data-theme="dark"] table tbody tr:hover td {
-            background: rgba(60, 60, 70, 0.9);
+            background: rgba(48, 62, 84, 0.95);
         }
 
         [data-theme="dark"] .error-message {
@@ -1248,6 +1285,10 @@
             border-color: #3366dd;
         }
 
+        .cards-view table tbody tr:hover td {
+            background: transparent;
+        }
+
         .cards-view table tbody td {
             display: grid;
             grid-template-columns: auto 1fr;
@@ -1322,6 +1363,11 @@
             grid-column: 1;
             border-bottom: none;
             padding-bottom: 0;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: normal;
         }
 
         .cards-view table tbody td:first-child a.site-screenshot-link {
@@ -1345,14 +1391,16 @@
             color: #00ff99;
         }
 
+        [data-theme="dark"] .cards-view table tbody tr:hover td {
+            background: transparent;
+        }
+
 
         @media (max-width: 900px) {
-            .cards-view[data-card-cols="4"] table tbody,
-            .cards-view[data-card-cols="5"] table tbody {
+            .cards-view[data-card-cols="4"] table tbody {
                 gap: 8px;
             }
-            .cards-view[data-card-cols="4"] table tbody tr,
-            .cards-view[data-card-cols="5"] table tbody tr {
+            .cards-view[data-card-cols="4"] table tbody tr {
                 padding: 8px;
                 gap: 8px;
             }
@@ -1374,8 +1422,7 @@
             .cards-view table tbody tr {
                 padding: 12px;
             }
-            .cards-view[data-card-cols="4"] table tbody tr,
-            .cards-view[data-card-cols="5"] table tbody tr {
+            .cards-view[data-card-cols="4"] table tbody tr {
                 padding: 8px;
                 gap: 8px;
             }
@@ -1447,7 +1494,6 @@
                 <button type="button" class="card-columns-btn" data-cols="2" aria-label="2 карточки в ряд">2</button>
                 <button type="button" class="card-columns-btn" data-cols="3" aria-label="3 карточки в ряд">3</button>
                 <button type="button" class="card-columns-btn" data-cols="4" aria-label="4 карточки в ряд">4</button>
-                <button type="button" class="card-columns-btn" data-cols="5" aria-label="5 карточек в ряд">5</button>
             </div>
             <select id="themeSwitch" aria-label="Выбор темы">
                 <option value="light">Светлая</option>
@@ -1554,7 +1600,7 @@
             theme: 'light',
             view: 'table',
             cardColumns: 2,
-            cardColumnsMax: 5,
+            cardColumnsMax: 4,
             user: null,
             page: 1,
             rowsPerPage: 10,
@@ -1623,7 +1669,7 @@
 
         function setCardColumns(count) {
             const cols = Number(count);
-            const max = appState.cardColumnsMax || 5;
+            const max = appState.cardColumnsMax || 4;
             appState.cardColumns = (cols >= 1 && cols <= max) ? cols : 2;
             localStorage.setItem('cardColumns', String(appState.cardColumns));
             updateCardColumnsUI();
@@ -1643,9 +1689,10 @@
         function restoreViewPreferences() {
             const savedView = localStorage.getItem('view') === 'cards' ? 'cards' : 'table';
             const savedCols = parseInt(localStorage.getItem('cardColumns'), 10);
-            const max = appState.cardColumnsMax || 5;
+            const max = appState.cardColumnsMax || 4;
             appState.view = savedView;
-            appState.cardColumns = (savedCols >= 1 && savedCols <= max) ? savedCols : 2;
+            appState.cardColumns = (savedCols >= 1) ? Math.min(savedCols, max) : 2;
+            if (savedCols > max) localStorage.setItem('cardColumns', String(appState.cardColumns));
             const tableSection = document.querySelector('.table-section');
             if (tableSection) {
                 tableSection.classList.toggle('cards-view', appState.view === 'cards');
@@ -1761,8 +1808,10 @@
             const icon = document.createElement('i');
             icon.className = 'fab fa-telegram-plane';
             icon.setAttribute('aria-hidden', 'true');
+            const label = document.createElement('span');
+            label.textContent = 'Обсудить в Telegram';
             link.appendChild(icon);
-            link.appendChild(document.createTextNode(' Обсудить в Telegram'));
+            link.appendChild(label);
             return link;
         }
 
@@ -1982,12 +2031,16 @@
             return { icon: '<i class="fas fa-circle"></i>', bg: 'payment-card', url: '#' };
         }
 
+        function createEmptyValue() {
+            const empty = document.createElement('span');
+            empty.className = 'empty-value';
+            empty.textContent = 'Не указано';
+            return empty;
+        }
+
         function createPaymentIconsElement(value) {
             if (!value || !value.trim()) {
-                const empty = document.createElement('span');
-                empty.className = 'payment-empty';
-                empty.textContent = 'Не указано';
-                return empty;
+                return createEmptyValue();
             }
 
             const container = document.createElement('div');
@@ -2023,12 +2076,15 @@
             return container;
         }
 
-        function createTableCell(value, label, creator = (val => document.createTextNode(escapeHTML(val || 'Не указано')))) {
+        function createTableCell(value, label, creator = (val => document.createTextNode(escapeHTML(val)))) {
             const td = document.createElement('td');
             td.setAttribute('data-label', label);
-            
+            const isEmpty = value == null || (typeof value === 'string' && !value.trim());
+
             if (label === 'Платежные системы') {
                 td.appendChild(createPaymentIconsElement(value));
+            } else if (isEmpty) {
+                td.appendChild(createEmptyValue());
             } else {
                 td.appendChild(creator(value));
             }
