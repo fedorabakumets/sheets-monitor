@@ -1,0 +1,21 @@
+{
+  "name": "Sheets Monitor",
+  "install": "python3 --version",
+  "terminals": [
+    {
+      "name": "Site Server (port 5000)",
+      "command": "cd /workspace && python3 server.py",
+      "description": "Serves the static site (index.html, all-changes.html) plus the /api/changes and /api/config endpoints on http://localhost:5000"
+    }
+  ],
+  "ports": [
+    {
+      "name": "web",
+      "port": 5000
+    }
+  ],
+  "egressAllowlist": [
+    "docs.google.com",
+    "sheets.googleapis.com"
+  ]
+}
